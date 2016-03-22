@@ -1,1 +1,33 @@
 first commit to git..
+
+###### this is the default method that calls the respective test for each of the roles ###########
+  def validate_page args
+    begin
+      role = args['role']
+      set_start_data args['title'], args['description']
+      @test_passed = true
+      output "Starting #{role} admin home page test"
+      idm_sign_in_with args['email'], args['password']
+
+      @browser_obj.div(:id=>"lighthouse-wrapper").wait_until_present
+
+      case
+      when role == 'basic_it_admin'
+        validate_page_as_it_admin 'basic'
+      when role == 'pro_it_admin'
+        validate_page_as_it_admin 'pro'
+      when role == 'protrial_it_admin'
+        validate_page_as_it_admin 'protrial'
+      when role == 'basic_managed_user'
+        validate_page_as_managed_user 'basic'
+      when role == 'pro_managed_user'
+        validate_page_as_managed_user 'pro'
+      end
+      idm_sign_out
+      output "Finished #{role} user home page test"
+      set_end_data
+    rescue => ex
+      output "ERROR: Exception caught during home page test #{ex}"
+      rescue_func ex
+    end
+  end
